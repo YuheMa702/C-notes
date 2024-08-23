@@ -9,6 +9,24 @@ Mastering C is crucial for having a solid foundation in data structures and algo
 #include <stdbool.h>
 #include <windows.h>
 
+// Function declarations
+void printDataTypes();
+void conditionals();
+void loops();
+
+
+// Technically you can write all C code in one line but it's bad style!
+int main() {
+    printf("Hello world!\n"); // Hello world!
+    printDataTypes();
+    Sleep(3000);
+    conditionals();
+    Sleep(3000);
+    loops();
+    return 0;
+}
+
+// Function definitions
 void printDataTypes() {
     printf("**Basic datatypes in C**\n");
     bool yes = true, no = false;            // 1 byte
@@ -117,16 +135,3 @@ void loops() {
         printf("This line will run at least once no matter what!\n");
     } while (n > 0);
 }
-
-
-// Technically you can write all C code in one line but it's bad style!
-int main() {
-    printf("Hello world!\n"); // Hello world!
-    printDataTypes();
-    Sleep(3000);
-    conditionals();
-    Sleep(3000);
-    loops();
-    return 0;
-}
-
