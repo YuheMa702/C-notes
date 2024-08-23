@@ -32,7 +32,7 @@ void pointers() {
     printf("Addr of first char of word is: %p\n", word_p);
     // Note a dereferencing trick: *(p + n) == p[n]
 
-    int length = sizeof(arr)/sizeof(*arr); // calc the correct length of any array via total size divided by the size of first elem
+    int length = sizeof(arr)/sizeof(*arr); // calc the correct length of any array on stack via total size divided by the size of first elem
     int* p = arr; // arr is already a pointer pointing to the addr of the first int on the stack segment if C memory
     for (int i = 0; i < length; i++) {
         printf("Addr of int at idx %d is: %p\n", i + 1, (p + i)); // or &(*(p + i)) note i means ith elem
