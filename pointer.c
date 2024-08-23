@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 void pointers();
 
@@ -37,4 +38,20 @@ void pointers() {
     for (int i = 0; i < length; i++) {
         printf("Addr of int at idx %d is: %p\n", i + 1, (p + i)); // or &(*(p + i)) note i means ith elem
     }
+
+    // generic pointers (Powerful, flexible, unsafe!!! Programmers must cast the right type when dereferencing)
+    int* integer = calloc(1, sizeof(int)); // calloc will set data to default values
+    float* decimal = malloc(sizeof(float));
+    *decimal = 3.14;
+    bool yes = true;
+
+    // create void pointers
+    void* p1 = integer;
+    void* p2 = decimal;
+    void* p3 = &yes;
+
+    // dereference void pointers
+    printf("val pointed to by p1 is %d\n", *(int*)p1);
+    printf("val pointed to by p2 is %f\n", *(float*)p2);
+    printf("val pointed to by p3 is %d\n", *(bool*)p3);
 }
