@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <string.h>
+#include <direct.h> // For _mkdir on Windows
+#include <Windows.h>
 
 
 #define MAX_CONTENT_SIZE 500
@@ -11,6 +13,10 @@
 /*
 This todolist app should support CRUD options
 */
+
+void create_todo_directory() {
+    _mkdir("C:\\todolist");
+}
 
 
 typedef struct todo_header todo;
@@ -99,11 +105,11 @@ void update_task(app* APP) {
     write_task(APP, idx);
 }   
 
-void mark_task(app* APP) {
+void check_task(app* APP) {
     int idx = get_idx(APP);
     APP->tasks[idx].finished = true;
 }
-void unmark_task(app* APP) {
+void uncheck_task(app* APP) {
     int idx = get_idx(APP);
     APP->tasks[idx].finished = false;
 }
@@ -119,7 +125,7 @@ void delete_task(app* APP) {
 }
 
 void display(app* APP) {
-    printf("Displaying your tasks:\n");
+    printf("Your tasks:\n");
     if (APP->next == 0) printf("You currently have no task\n");
     for (int i = 0; i < APP->next; i++) {
         todo t = APP->tasks[i];
@@ -131,7 +137,7 @@ void display(app* APP) {
 }
 
 void save_tasks(app* APP) {
-    FILE *file = fopen("todo.txt", "w");
+    FILE *file = fopen("C:\\todolist\\todo.txt", "w");
     if (file == NULL) {
         printf("Error opening file for saving!\n");
         return;
@@ -146,8 +152,8 @@ void save_tasks(app* APP) {
 }
 
 void load_tasks(app* APP) {
-    FILE *file = fopen("todo.txt", "r");
-    char buf[MAX_LINE_LENGTH];
+    FILE *file = fopen("C:\\todolist\\todo.txt", "r");
+    char* buf = malloc(sizeof(char)*MAX_LINE_LENGTH);
     if (file == NULL) {
         printf("No saved tasks found.\n");
         return;
@@ -159,6 +165,7 @@ void load_tasks(app* APP) {
         fscanf(file, "%d\n", &(t.size)); // Load the content length
         int size = t.size;
         while (size > 0) {
+            printf("buf is: %s", buf);
             // Keep reading until reaching content length
             fgets(buf, MAX_LINE_LENGTH, file); // Load the task content
             strncat(t.content, buf, MAX_LINE_LENGTH);
@@ -167,20 +174,23 @@ void load_tasks(app* APP) {
         // printf("%d. status=%d, size=%d, content=\n%s", i, t.finished, t.size, t.content);
         APP->tasks[i] = t; // Copy the data to task[i]
     }
+    free(buf);
     fclose(file);
 }
 
 
 
 int main() {
+    create_todo_directory();
     char action[ACTION_BUF_SIZE];
     app* APP = calloc(1, sizeof(app));
     load_tasks(APP);
     while(1) {
         system("cls");
-        printf("Welcome to the MIN TODOLIST APP\n");
-        printf("Add (a)\nEdit (e)\nDelete (d)\nMark (m)\nUnmark (u)\nQuit (q)\n\n");
+        printf("Welcome to Yuhe's TODOLIST APP!\n");
+        printf("Add(a) Edit(e) Delete(d) Check(c) Uncheck(u) Quit(q)\n\n");
         display(APP);
+        printf("\nYour action:\n");
         fgets(action, ACTION_BUF_SIZE, stdin);
 
         switch (action[0])
@@ -195,15 +205,19 @@ int main() {
             delete_task(APP);
             break;
         case 'm':
-            mark_task(APP);
+            check_task(APP);
             break;
         case 'u':
-            unmark_task(APP);
+            uncheck_task(APP);
             break;
         case 'q':
-            printf("Bye!");
+            Sleep(800);
+            printf("Saving your data...");
+            Sleep(800);
             save_tasks(APP);
+            printf("done!\n");
             free(APP);
+            Sleep(600);
             return EXIT_SUCCESS;
         default:
             // Do nothing
