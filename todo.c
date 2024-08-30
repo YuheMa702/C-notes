@@ -7,7 +7,7 @@
 
 
 #define MAX_CONTENT_SIZE 500
-#define MAX_LINE_LENGTH 100
+#define MAX_LINE_LENGTH 120
 #define MAX_TASK_COUNT 20
 #define ACTION_BUF_SIZE 10
 /*
@@ -21,15 +21,15 @@ void create_todo_directory() {
 
 typedef struct todo_header todo;
 struct todo_header {
-    int size;
+    int size; // size = len(centent)
     char content[MAX_CONTENT_SIZE];
     bool finished;
 };
 
 typedef struct todo_list_header app;
 struct todo_list_header {
-    int next;
-    todo tasks[MAX_TASK_COUNT];
+    int next; // next = # of tasks = idx of next task
+    todo tasks[MAX_TASK_COUNT]; // tasks represented as a fixed-length array
 };
 
 
@@ -82,7 +82,7 @@ void add_task(app* APP) {
 }
 
 bool task_exist(app* APP, int idx) {
-    return idx < APP->next;
+    return 0 <= idx && idx < APP->next;
 }
 
 
@@ -107,11 +107,11 @@ void update_task(app* APP) {
 
 void check_task(app* APP) {
     int idx = get_idx(APP);
-    APP->tasks[idx].finished = true;
+    set_status(APP, idx, true);
 }
 void uncheck_task(app* APP) {
     int idx = get_idx(APP);
-    APP->tasks[idx].finished = false;
+    set_status(APP, idx, false);
 }
 
 void delete_task(app* APP) {
@@ -130,7 +130,7 @@ void display(app* APP) {
     for (int i = 0; i < APP->next; i++) {
         todo t = APP->tasks[i];
         printf("[%d]", i);
-        if (t.finished) printf("(X): "); // print the long char
+        if (t.finished) printf("(X): "); 
         else printf("( ): ");
         printf("%s", APP->tasks[i].content);
     }
@@ -160,16 +160,17 @@ void load_tasks(app* APP) {
     }
     fscanf(file, "%d\n", &(APP->next)); // Load the number of tasks
     for (int i = 0; i < APP->next; i++) {
-        todo t;
+        todo t = {0, "", false}; // temp todo structure
         fscanf(file, "%d\n", &(t.finished)); // Load the task status
         fscanf(file, "%d\n", &(t.size)); // Load the content length
         int size = t.size;
         while (size > 0) {
-            printf("buf is: %s", buf);
             // Keep reading until reaching content length
+            strcpy(buf, ""); // Clear buf
             fgets(buf, MAX_LINE_LENGTH, file); // Load the task content
             strncat(t.content, buf, MAX_LINE_LENGTH);
             size -= strlen(buf);
+            // printf("buf is: %s, size=%d\n", buf, size);
         }
         // printf("%d. status=%d, size=%d, content=\n%s", i, t.finished, t.size, t.content);
         APP->tasks[i] = t; // Copy the data to task[i]
